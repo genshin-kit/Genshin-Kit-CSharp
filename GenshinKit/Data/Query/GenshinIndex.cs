@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace GenshinKit.Data.Query
 {
-    public class Index
+    public class GenshinIndex
     {
         [JsonProperty("avatars")]
         public IEnumerable<Avatar> Avatars { get; set; }

@@ -1,4 +1,6 @@
-﻿namespace GenshinKit.Data
+﻿using System.Collections.Generic;
+
+namespace GenshinKit.Data
 {
     public class GenshinQueryConfig
     {
@@ -7,14 +9,10 @@
         /// <summary>
         /// Version of hoyolab
         /// </summary>
-        public string Version { get; set; }
+        internal string Version { get; set; }
 
-        public string Cookie { get; set; }
+        internal IEnumerable<string> Cookies { get; set; }
 
-        internal string Url { get; set; }
-
-        public string Uid { get; set; }
-
-        internal GenshinServer Server { get; set; }
+        internal string Uid { get; set; }
     }
 }

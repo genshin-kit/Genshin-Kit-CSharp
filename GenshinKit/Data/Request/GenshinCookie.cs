@@ -1,9 +1,13 @@
-﻿namespace GenshinKit.Data.Request
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace GenshinKit.Data.Request
 {
     public class GenshinCookie
     {
         public string Cookie { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public GenshinServerType ServerType { get; set; }
 
         public GenshinCookie(string cookie = null, GenshinServerType serverType = default)

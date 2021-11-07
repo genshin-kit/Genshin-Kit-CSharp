@@ -6,7 +6,6 @@ using Flurl.Http;
 using GenshinKit.Data;
 using GenshinKit.Data.Exceptions;
 using GenshinKit.Data.Query;
-using GenshinKit.Data.Request;
 using GenshinKit.Utility;
 using Newtonsoft.Json;
 
@@ -21,7 +20,7 @@ namespace GenshinKit.Query
             var server = Config.Uid.GetGenshinServer();
             var ds = Config.Ds;
             var cookie = GetCookie();
-            var language = Config.Language.ToString().Replace("_", "-");
+            var language = Config.Language.ToString()!.Replace("_", "-");
 
             var response = await $"{server.GetGenshinApiEndpoint()}index?server={server}&role_id={Config.Uid}"
                 .WithHeader("x-rpc-client_type", "5")

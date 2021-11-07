@@ -31,7 +31,7 @@ namespace GenshinKit.Utility
         /// <param name="uid"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public static GenshinServer DistinguishGenshinServer(this string uid)
+        public static GenshinServer GetGenshinServer(this string uid)
         {
             return Convert.ToInt32(uid[0].ToString()) switch
             {
@@ -42,6 +42,36 @@ namespace GenshinKit.Utility
                 8 => GenshinServer.os_asia,
                 9 => GenshinServer.os_cht,
                 _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+
+        /// <summary>
+        /// Distinguish genshin server type(international(oversea) server or Chinese server)
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public static GenshinServerType GetGenshinServerType(this string uid)
+        {
+            return uid.GetGenshinServer().GetGenshinServerType();
+        }
+
+        /// <summary>
+        /// Distinguish genshin server type(international(oversea) server or Chinese server)
+        /// </summary>
+        /// <param name="server"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public static GenshinServerType GetGenshinServerType(this GenshinServer server)
+        {
+            return server switch
+            {
+                GenshinServer.os_euro
+                    or GenshinServer.os_asia
+                    or GenshinServer.os_usa
+                    or GenshinServer.os_cht => GenshinServerType.Oversea,
+                GenshinServer.cn_gf01
+                    or GenshinServer.cn_qd01 => GenshinServerType.Chinese,
+                _ => throw new ArgumentOutOfRangeException(nameof(server), server, null)
             };
         }
     }

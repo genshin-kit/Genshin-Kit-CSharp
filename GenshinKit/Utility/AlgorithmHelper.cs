@@ -43,11 +43,10 @@ namespace GenshinKit.Utility
         /// </summary>
         /// ///
         /// <param name="uid">Specific player's uid</param>
-        /// <param name="saltProvider">Use your own salt</param>
         /// <returns></returns>
-        public static string GetDs(string uid, Func<string> saltProvider = null)
+        public static string GetDs(string uid)
         {
-            return GetDs(uid, string.Empty, saltProvider);
+            return GetDs(uid, string.Empty);
         }
 
         /// <summary>
@@ -56,18 +55,15 @@ namespace GenshinKit.Utility
         /// ///
         /// <param name="uid">Specific player's uid</param>
         /// <param name="body"></param>
-        /// <param name="saltProvider">Use your own salt</param>
         /// <returns></returns>
-        public static string GetDs(string uid, string body, Func<string> saltProvider = null)
+        public static string GetDs(string uid, string body)
         {
-            saltProvider ??= () => "xV8v4Qu54lUKrEYFZkJhB8cuOh9Asafs";
-            
-            var salt = saltProvider();
+            var salt = "xV8v4Qu54lUKrEYFZkJhB8cuOh9Asafs";
             var t = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds();
             var r = GetRandomString();
 
             var aftermath =
-                $"salt={salt}&t={t}&r={r}&b={body}&q=role_id={uid}&server={uid.DistinguishGenshinServer()}".ToMd5();
+                $"salt={salt}&t={t}&r={r}&b={body}&q=role_id={uid}&server={uid.GetGenshinServer()}".ToMd5();
 
             return $"{t},{r},{aftermath}";
         }
@@ -75,13 +71,10 @@ namespace GenshinKit.Utility
         /// <summary>
         /// Generate a new dynamic secret for genshin oversea servers
         /// </summary>
-        /// <param name="saltProvider">Use your own salt</param>
         /// <returns></returns>
-        public static string GetDs(Func<string> saltProvider = null)
+        public static string GetDs()
         {
-            saltProvider ??= () => "6s25p5ox5y14umn1p61aqyyvbvvl3lrt";
-            
-            var salt = saltProvider();
+            var salt = "6s25p5ox5y14umn1p61aqyyvbvvl3lrt";
             var t = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds();
             var r = GetRandomString();
 

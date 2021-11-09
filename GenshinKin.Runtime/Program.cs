@@ -18,7 +18,7 @@ namespace GenshinKin.Runtime
                 .WithGenshinCookies(Confidentiality.GetCookies())
                 .WithLanguage(GenshinLanguage.ja_jp)
                 .GetGenshinIndexAsync();
-            Console.WriteLine(index.ToJsonString());
+            Console.WriteLine(index.Stats.ActiveDays);
         }
     }
 }

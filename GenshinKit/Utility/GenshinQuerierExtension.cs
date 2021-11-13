@@ -79,50 +79,14 @@ namespace GenshinKit.Utility
         /// Use your custom dynamic secret
         /// </summary>
         /// <param name="config"></param>
-        /// <param name="ds"></param>
+        /// <param name="dynamic"></param>
         /// <returns></returns>
-        public static GenshinQueryConfig WithGenshinDs(this GenshinQueryConfig config, string ds)
+        public static GenshinQueryConfig WithGenshinDynamic(this GenshinQueryConfig config, GenshinDynamic dynamic)
         {
-            config.Ds = ds;
-            
-            return config;
-        }
-
-        /// <summary>
-        /// Use your custom dynamic secret
-        /// </summary>
-        /// <param name="config"></param>
-        /// <param name="dsProvider"></param>
-        /// <returns></returns>
-        public static GenshinQueryConfig WithGenshinDs(this GenshinQueryConfig config, Func<string> dsProvider)
-        {
-            config.Ds = dsProvider();
-
-            return config;
-        }
-
-        /// <summary>
-        /// Use your specified hoyolab version
-        /// </summary>
-        /// <param name="config"></param>
-        /// <param name="version"></param>
-        /// <returns></returns>
-        public static GenshinQueryConfig WithHoyolabVersion(this GenshinQueryConfig config, string version)
-        {
-            config.Version = version;
-
-            return config;
-        }
-
-        /// <summary>
-        /// Use your specified hoyolab version
-        /// </summary>
-        /// <param name="config"></param>
-        /// <param name="versionProvider"></param>
-        /// <returns></returns>
-        public static GenshinQueryConfig WithHoyolabVersion(this GenshinQueryConfig config, Func<string> versionProvider)
-        {
-            config.Version = versionProvider();
+            if (config.Uid.IsOversea())
+                config.Dynamic[1] = dynamic;
+            else
+                config.Dynamic[0] = dynamic;
 
             return config;
         }
@@ -149,13 +113,20 @@ namespace GenshinKit.Utility
         public static async Task<GenshinIndex> GetGenshinIndexAsync(this GenshinQueryConfig config)
         {
             //specify default configurations
-            config.Ds ??= config.Uid.GetGenshinServerType() == GenshinServerType.Oversea
-                ? AlgorithmHelper.GetDs()
-                : AlgorithmHelper.GetDs(config.Uid);
+            if (config.Uid.IsOversea())
+            {
+                config.Dynamic[1].Ds ??= AlgorithmHelper.GetDs();
+                config.Dynamic[1].Version ??= "1.5.0";
+            }
+            else
+            {
+                config.Dynamic[0].Ds ??= AlgorithmHelper.GetDsWishUid(config.Uid);
+                config.Dynamic[0].Version ??= "2.11.1";
+            }
 
-            config.Version ??= "2.11.1";
-            config.Language ??= GenshinLanguage.en_us;
+            config.Language ??= config.Uid.IsOversea() ? GenshinLanguage.en_us : GenshinLanguage.zh_cn;
                 
+            //throw exceptions if any
             if (config.Uid.IsNullOrEmpty())
                 throw new GenshinQueryException("Invalid config specified!");
 

@@ -18,7 +18,7 @@ namespace GenshinKit.Utility
                 GenshinServer.os_euro
                     or GenshinServer.os_asia
                     or GenshinServer.os_usa
-                    or GenshinServer.os_cht => "https://api-os-takumi.mihoyo.com/game_record/genshin/api/",
+                    or GenshinServer.os_cht => "https://bbs-api-os.mihoyo.com/game_record/genshin/api/",
                 GenshinServer.cn_gf01
                     or GenshinServer.cn_qd01 => "https://api-takumi.mihoyo.com/game_record/app/genshin/api/",
                 _ => throw new ArgumentOutOfRangeException(nameof(server), server, null)
@@ -53,6 +53,26 @@ namespace GenshinKit.Utility
         public static GenshinServerType GetGenshinServerType(this string uid)
         {
             return uid.GetGenshinServer().GetGenshinServerType();
+        }
+
+        /// <summary>
+        /// Check if a uid belongs to oversea servers
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public static bool IsOversea(this string uid)
+        {
+            return uid.GetGenshinServerType() == GenshinServerType.Oversea;
+        }
+        
+        /// <summary>
+        /// Check if a uid belongs to chinese servers
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public static bool IsChinese(this string uid)
+        {
+            return uid.GetGenshinServerType() == GenshinServerType.Chinese;
         }
 
         /// <summary>

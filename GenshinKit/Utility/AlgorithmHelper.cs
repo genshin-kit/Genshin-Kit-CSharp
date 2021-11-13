@@ -43,10 +43,11 @@ namespace GenshinKit.Utility
         /// </summary>
         /// ///
         /// <param name="uid">Specific player's uid</param>
+        /// <param name="salt">Customized salt</param>
         /// <returns></returns>
-        public static string GetDs(string uid)
+        public static string GetDsWishUid(string uid, string salt = "xV8v4Qu54lUKrEYFZkJhB8cuOh9Asafs")
         {
-            return GetDs(uid, string.Empty);
+            return GetDsWithUidAndBody(uid, string.Empty, salt);
         }
 
         /// <summary>
@@ -55,10 +56,10 @@ namespace GenshinKit.Utility
         /// ///
         /// <param name="uid">Specific player's uid</param>
         /// <param name="body"></param>
+        /// <param name="salt">Customized salt</param>
         /// <returns></returns>
-        public static string GetDs(string uid, string body)
+        public static string GetDsWithUidAndBody(string uid, string body, string salt = "xV8v4Qu54lUKrEYFZkJhB8cuOh9Asafs")
         {
-            var salt = "xV8v4Qu54lUKrEYFZkJhB8cuOh9Asafs";
             var t = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds();
             var r = GetRandomString();
 
@@ -72,9 +73,8 @@ namespace GenshinKit.Utility
         /// Generate a new dynamic secret for genshin oversea servers
         /// </summary>
         /// <returns></returns>
-        public static string GetDs()
+        public static string GetDs(string salt = "6s25p5ox5y14umn1p61aqyyvbvvl3lrt")
         {
-            var salt = "6s25p5ox5y14umn1p61aqyyvbvvl3lrt";
             var t = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds();
             var r = GetRandomString();
 

@@ -28,6 +28,6 @@ namespace GenshinKit.Data
 
         internal string Uid { get; set; }
 
-        public GenshinLanguage? Language { get; set; }
+        public string Language { get; set; }
     }
 }

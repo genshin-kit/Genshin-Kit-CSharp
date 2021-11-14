@@ -123,7 +123,7 @@ namespace GenshinKit.Utility
             var response = await config.Url
                 .WithHeader("x-rpc-client_type", "5")
                 .WithHeader("x-rpc-app_version", config.Version)
-                .WithHeader("x-rpc-language", config.Language.ToString()!.Replace("_", "-"))
+                .WithHeader("x-rpc-language", config.Language)
                 .WithHeader("Cookie", cookie)
                 .WithHeader("DS", config.Ds)
                 .GetStringAsync();;
@@ -133,7 +133,7 @@ namespace GenshinKit.Utility
                 throw new GenshinQueryException(
                     $"Failed to query: {response.Fetch("message")}");
             }
-
+            
             var data = response.Fetch("data");
             return JsonConvert.DeserializeObject<T>(data);
         }

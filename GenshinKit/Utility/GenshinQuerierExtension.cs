@@ -100,7 +100,7 @@ namespace GenshinKit.Utility
         /// <returns></returns>
         public static GenshinQueryConfig WithLanguage(this GenshinQueryConfig config, GenshinLanguage language)
         {
-            config.Language = language;
+            config.Language = language.ToString().Replace("_", "-");
             
             return config;
         }
@@ -126,7 +126,7 @@ namespace GenshinKit.Utility
                 config.Dynamic[0].Version ??= "2.11.1";
             }
 
-            config.Language ??= GenshinLanguage.en_us;
+            config.Language ??= GenshinLanguage.en_us.ToString().Replace("_", "-");
                 
             //throw exceptions if any
             if (config.Uid.IsNullOrEmpty())

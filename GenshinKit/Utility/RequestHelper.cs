@@ -119,20 +119,15 @@ namespace GenshinKit.Utility
         internal static async Task<T> GetAsync<T>(GenshinQueryConfig config)
         {
             var cookie = GetCookie(config);
-
-            var request =
-                config.Url
-                    .WithHeader("x-rpc-client_type", "5")
-                    .WithHeader("x-rpc-app_version", config.Version)
-                    .WithHeader("Cookie", cookie)
-                    .WithHeader("DS", config.Ds);
-
-            if (config.Uid.IsOversea())
-                request = request.WithHeader("x-rpc-language", config.Language);
-
-
-            var response = await (await request.GetAsync()).GetStringAsync();
             
+            var response = await config.Url
+                .WithHeader("x-rpc-client_type", "5")
+                .WithHeader("x-rpc-app_version", config.Version)
+                .WithHeader("x-rpc-language", config.Language.ToString()!.Replace("_", "-"))
+                .WithHeader("Cookie", cookie)
+                .WithHeader("DS", config.Ds)
+                .GetStringAsync();;
+
             if (response.Fetch("retcode") != "0")
             {
                 throw new GenshinQueryException(

@@ -19,7 +19,8 @@ namespace GenshinKin.Runtime
             //
             var index = await "109195224"
                 .WithGenshinCookies(Confidentiality.GetCookies())
-                .GetGenshinAbyssAsync();
+                .WithLanguage(GenshinLanguage.en_us)
+                .GetGenshinIndexAsync();
             Console.WriteLine(index.ToJsonString());
         }
 

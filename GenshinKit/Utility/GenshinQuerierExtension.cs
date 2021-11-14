@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AHpx.Extensions.StringExtensions;
+using Flurl;
 using GenshinKit.Data;
 using GenshinKit.Data.Exceptions;
 using GenshinKit.Data.Query;
@@ -103,6 +104,39 @@ namespace GenshinKit.Utility
             
             return config;
         }
+
+        /// <summary>
+        /// You don't have to invoke this in the chain, but you can as you want lol
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        /// <exception cref="GenshinQueryException"></exception>
+        public static GenshinQueryConfig WithDefaultConfig(this GenshinQueryConfig config)
+        {
+            //specify default configurations
+            
+            if (config.Uid.IsOversea())
+            {
+                config.Dynamic[1].Ds ??= config.GetDs();
+                config.Dynamic[1].Version ??= "1.5.0";
+            }
+            else
+            {
+                config.Dynamic[0].Ds ??= config.GetDs();
+                config.Dynamic[0].Version ??= "2.11.1";
+            }
+
+            config.Language ??= GenshinLanguage.en_us;
+                
+            //throw exceptions if any
+            if (config.Uid.IsNullOrEmpty())
+                throw new GenshinQueryException("Invalid config specified!");
+
+            if (!config.Cookies.Any())
+                throw new GenshinQueryException("Invalid cookie specified!");
+
+            return config;
+        }
         
         /// <summary>
         /// Query for general info of specified config
@@ -112,28 +146,31 @@ namespace GenshinKit.Utility
         /// <exception cref="GenshinQueryException"></exception>
         public static async Task<GenshinIndex> GetGenshinIndexAsync(this GenshinQueryConfig config)
         {
-            //specify default configurations
-            if (config.Uid.IsOversea())
-            {
-                config.Dynamic[1].Ds ??= AlgorithmHelper.GetDs();
-                config.Dynamic[1].Version ??= "1.5.0";
-            }
-            else
-            {
-                config.Dynamic[0].Ds ??= AlgorithmHelper.GetDsWishUid(config.Uid);
-                config.Dynamic[0].Version ??= "2.11.1";
-            }
+            var server = config.Uid.GetGenshinServer();
 
-            config.Language ??= config.Uid.IsOversea() ? GenshinLanguage.en_us : GenshinLanguage.zh_cn;
-                
-            //throw exceptions if any
-            if (config.Uid.IsNullOrEmpty())
-                throw new GenshinQueryException("Invalid config specified!");
-
-            if (!config.Cookies.Any())
-                throw new GenshinQueryException("Invalid cookie specified!");
+            config.Url = $"{server.GetGenshinApiEndpoint(GenshinEndpoint.index)}?server={server}&role_id={config.Uid}";
             
-            return await new GenshinQuerier { Config = config }.GetIndexAsync();
+            config = config.WithDefaultConfig();
+            
+            return await new GenshinQuerier(config).GetIndexAsync();
+        }
+
+        /// <summary>
+        /// Query for chronicle of spiral abyss 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        public static async Task<GenshinAbyss> GetGenshinAbyssAsync(this GenshinQueryConfig config, bool previous = false)
+        {
+            var server = config.Uid.GetGenshinServer();
+            var extra = previous ? new { schedule_type = 2 } : new { schedule_type = 1 };
+
+            config.Url = $"{server.GetGenshinApiEndpoint(GenshinEndpoint.spiralAbyss)}?server={server}&role_id={config.Uid}"
+                .SetQueryParams(extra);
+            
+            config = config.WithDefaultConfig();
+
+            return await new GenshinQuerier(config).GetAbyssAsync();
         }
     }
 }

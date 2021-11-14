@@ -6,6 +6,8 @@ namespace GenshinKit.Data
 {
     public class GenshinQueryConfig
     {
+        public string Url { get; set; }
+
         /// <summary>
         /// 0: Chinese, 1: Oversea
         /// </summary>

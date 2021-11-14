@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Flurl;
+using GenshinKit.Data;
 
 namespace GenshinKit.Utility
 {
@@ -39,48 +41,62 @@ namespace GenshinKit.Utility
         }
 
         /// <summary>
-        /// Generate a new dynamic secret for genshin chinese servers
+        /// Generate new dynamic secret with request body
         /// </summary>
-        /// ///
-        /// <param name="uid">Specific player's uid</param>
-        /// <param name="salt">Customized salt</param>
-        /// <returns></returns>
-        public static string GetDsWishUid(string uid, string salt = "xV8v4Qu54lUKrEYFZkJhB8cuOh9Asafs")
-        {
-            return GetDsWithUidAndBody(uid, string.Empty, salt);
-        }
-
-        /// <summary>
-        /// Generate a new dynamic secret for genshin chinese servers with body
-        /// </summary>
-        /// ///
-        /// <param name="uid">Specific player's uid</param>
+        /// <param name="config"></param>
         /// <param name="body"></param>
-        /// <param name="salt">Customized salt</param>
+        /// <param name="saltProvider"></param>
         /// <returns></returns>
-        public static string GetDsWithUidAndBody(string uid, string body, string salt = "xV8v4Qu54lUKrEYFZkJhB8cuOh9Asafs")
+        public static string GetDs(this GenshinQueryConfig config, string body, Func<string> saltProvider = null)
         {
-            var t = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds();
-            var r = GetRandomString();
+            var url = new Url(config.Url);
+            var queryParams = url.QueryParams.Select(valueTuple =>
+            {
+                (string name, string value) tuple = (valueTuple.Name, valueTuple.Value.ToString());
+                return tuple;
+            });
 
+            var query = string.Join("&", queryParams
+                .OrderBy(x => x.name)
+                .Select(tuple => $"{tuple.name}={tuple.value}"));
+
+
+            saltProvider ??= () => "xV8v4Qu54lUKrEYFZkJhB8cuOh9Asafs";
+            var currentTimeStamp = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds();
+            var randomString = GetRandomString();
+            var salt = saltProvider();
+            
             var aftermath =
-                $"salt={salt}&t={t}&r={r}&b={body}&q=role_id={uid}&server={uid.GetGenshinServer()}".ToMd5();
+                ($"salt={salt}" +
+                $"&t={currentTimeStamp}" +
+                $"&r={randomString}" +
+                $"&b={body}" +
+                $"&q={query}").ToMd5();
 
-            return $"{t},{r},{aftermath}";
+            return $"{currentTimeStamp},{randomString},{aftermath}";
         }
 
         /// <summary>
-        /// Generate a new dynamic secret for genshin oversea servers
+        /// Generate new dynamic secret
         /// </summary>
+        /// <param name="config"></param>
+        /// <param name="saltProvider"></param>
         /// <returns></returns>
-        public static string GetDs(string salt = "6s25p5ox5y14umn1p61aqyyvbvvl3lrt")
+        public static string GetDs(this GenshinQueryConfig config, Func<string> saltProvider = null)
         {
-            var t = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds();
-            var r = GetRandomString();
+            if (config.Uid.IsChinese()) return GetDs(config, string.Empty, saltProvider);
+            
+            saltProvider ??= () => "6s25p5ox5y14umn1p61aqyyvbvvl3lrt";
+                
+            var currentTimeStamp = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds();
+            var randomString = GetRandomString();
 
-            var aftermath = $"salt={salt}&t={t}&r={r}".ToMd5();
+            var aftermath = ($"salt={saltProvider()}" +
+                             $"&t={currentTimeStamp}" +
+                             $"&r={randomString}").ToMd5();
 
-            return $"{t},{r},{aftermath}";
+            return $"{currentTimeStamp},{randomString},{aftermath}";
+
         }
     }
 }

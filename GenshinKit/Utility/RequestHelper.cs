@@ -1,5 +1,14 @@
 ﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using AHpx.Extensions.JsonExtensions;
+using Flurl;
+using Flurl.Http;
 using GenshinKit.Data;
+using GenshinKit.Data.Exceptions;
+using GenshinKit.Data.Query;
+using GenshinKit.Data.Request;
+using NullValueHandling = Flurl.NullValueHandling;
 
 namespace GenshinKit.Utility
 {
@@ -9,9 +18,10 @@ namespace GenshinKit.Utility
         /// Get endpoint of genshin query api that distinguished by specific server region
         /// </summary>
         /// <param name="server">Various of genshin server specification</param>
+        /// <param name="endpoint"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public static string GetGenshinApiEndpoint(this GenshinServer server)
+        internal static string GetGenshinApiEndpoint(this GenshinServer server, GenshinEndpoint endpoint)
         {
             return server switch
             {
@@ -22,7 +32,7 @@ namespace GenshinKit.Utility
                 GenshinServer.cn_gf01
                     or GenshinServer.cn_qd01 => "https://api-takumi.mihoyo.com/game_record/app/genshin/api/",
                 _ => throw new ArgumentOutOfRangeException(nameof(server), server, null)
-            };
+            } + endpoint;
         }
 
         /// <summary>
@@ -93,6 +103,44 @@ namespace GenshinKit.Utility
                     or GenshinServer.cn_qd01 => GenshinServerType.Chinese,
                 _ => throw new ArgumentOutOfRangeException(nameof(server), server, null)
             };
+        }
+
+        public static string GetCookie(GenshinQueryConfig config)
+        {
+            var random = new Random();
+
+            var cookies = (config.Uid.GetGenshinServerType() == GenshinServerType.Oversea
+                ? config.Cookies.Where(x => x.ServerType == GenshinServerType.Oversea)
+                : config.Cookies.Where(x => x.ServerType == GenshinServerType.Chinese)).ToList();
+
+            return cookies[random.Next(cookies.Count)];
+        }
+        
+        internal static async Task<T> GetAsync<T>(GenshinQueryConfig config)
+        {
+            var cookie = GetCookie(config);
+
+            var request =
+                config.Url
+                    .WithHeader("x-rpc-client_type", "5")
+                    .WithHeader("x-rpc-app_version", config.Version)
+                    .WithHeader("Cookie", cookie)
+                    .WithHeader("DS", config.Ds);
+
+            if (config.Uid.IsOversea())
+                request = request.WithHeader("x-rpc-language", config.Language);
+
+
+            var response = await (await request.GetAsync()).GetStringAsync();
+            
+            if (response.Fetch("retcode") != "0")
+            {
+                throw new GenshinQueryException(
+                    $"Failed to query: {response.Fetch("message")}");
+            }
+
+            var data = response.Fetch("data");
+            return JsonConvert.DeserializeObject<T>(data);
         }
     }
 }

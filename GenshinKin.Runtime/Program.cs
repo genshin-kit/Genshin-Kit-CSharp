@@ -17,10 +17,11 @@ namespace GenshinKin.Runtime
         {
             //https://api-os-takumi.mihoyo.com/game_record/genshin/api/index?server=os_euro&role_id=709195224
             //
-            var index = await "109195224"
+            var index = await "504255267"
                 .WithGenshinCookies(Confidentiality.GetCookies())
                 .WithLanguage(GenshinLanguage.en_us)
                 .GetGenshinIndexAsync();
+
             Console.WriteLine(index.ToJsonString());
         }
 

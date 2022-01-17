@@ -3,13 +3,21 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <Title>GenshinKit</Title>
+        <Authors>AHpx</Authors>
+        <Description>Query for genshin impact players' info</Description>
+        <Copyright>Copyright 2022 AHpx all rights reserved,</Copyright>
+        <RepositoryUrl>https://github.com/genshin-kit/Genshin-Kit-CSharp</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageTags>Genshin</PackageTags>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AHpx.Extensions" Version="1.0.1"/>
-        <PackageReference Include="Flurl" Version="3.0.2"/>
-        <PackageReference Include="Flurl.Http" Version="3.2.0"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
+        <PackageReference Include="AHpx.Extensions" Version="1.0.1" />
+        <PackageReference Include="Flurl" Version="3.0.2" />
+        <PackageReference Include="Flurl.Http" Version="3.2.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
             <_Parameter1>GenshinKit.Runtime</_Parameter1>
